@@ -68,8 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }]
           };
 
-          const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual API key
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+           const apiKey = "AIzaSyCuMBNIcuXj3njv2T3wAw8bajABxcuOsCU"; 
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
           const response = await fetch(apiUrl, {
             method: 'POST',
