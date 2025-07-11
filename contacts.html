@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contacts - CSE 350 Translation Webpage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="contact-container">
+    <div class="contacts-topbar">
+      <div>Contacts</div>
+      <button onclick="window.location.href='index.html'">← Back to Chat</button>
+    </div>
+
+    <div class="contacts-section">
+      <div class="add-contact">
+        <input type="text" id="contactName" placeholder="Enter contact name..." />
+        <button onclick="addContact()">Add</button>
+      </div>
+
+      <div class="contact-list" id="contactList">
+        <!-- Contacts will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
