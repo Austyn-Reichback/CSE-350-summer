@@ -9,44 +9,56 @@ function detectBrowserLanguage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Language selector logic
+  // Language selector setup (works across multiple pages)
   const languageSelector =
     document.getElementById("language-select") ||
-    document.getElementById("targetLanguage") ||
+    document.getElementById("targetLanguage") ||  // fallback, but should be a select
     document.getElementById("signin-language-select") ||
     document.getElementById("register-language-select") ||
     document.getElementById("contacts-language-select");
 
-  const savedLang = localStorage.getItem("preferredLanguage");
-  const detectedLang = savedLang || detectBrowserLanguage();
+  const supportedLanguages = ['en', 'es', 'fr', 'de'];
 
+  // Detect browser language
+  function detectBrowserLanguage() {
+    const lang = navigator.language || navigator.userLanguage;
+    const shortLang = lang.split('-')[0];
+    return supportedLanguages.includes(shortLang) ? shortLang : 'en';
+  }
+
+  const detectedLang = detectBrowserLanguage();
+
+  // Get preferred language from localStorage or fallback
+  const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || detectedLang || 'en';
+
+  // Initialize language selector value and UI
   if (languageSelector) {
-    languageSelector.value = detectedLang;
-    updateLanguageUI(detectedLang);
+    languageSelector.value = getPreferredLanguage();
+    updateLanguageUI(languageSelector.value);
 
+    // When user changes language, update storage, UI, and current language variable
     languageSelector.addEventListener("change", (e) => {
       const selectedLang = e.target.value;
       localStorage.setItem("preferredLanguage", selectedLang);
       updateLanguageUI(selectedLang);
     });
   } else {
-    updateLanguageUI(detectedLang);
+    updateLanguageUI(getPreferredLanguage());
   }
 
-  // Chat translation logic
+  // Use the languageSelector's value as the current target language for translation
+  // This means you don't need a separate element with id 'targetLanguage' for language.
+  
   const inputText = document.querySelector('.input-area input');
-  const targetLanguage = document.getElementById('targetLanguage');
   const translateButton = document.querySelector('.input-area button');
   const translatedText = document.querySelector('.message-area');
   const loadingIndicator = document.createElement('div');
   loadingIndicator.classList.add('loading-indicator', 'hidden');
   if (translatedText) translatedText.appendChild(loadingIndicator);
 
-  if (inputText && targetLanguage && translateButton && translatedText) {
+  if (inputText && translateButton && translatedText) {
     translateButton.addEventListener('click', async () => {
       const text = inputText.value.trim();
-      const lang = targetLanguage.value;
-
       if (!text) {
         const errorDiv = document.createElement('div');
         errorDiv.textContent = 'Please enter text to translate.';
@@ -60,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
       translateButton.disabled = true;
 
       try {
+        // Use the languageSelector's current value
+        const lang = languageSelector ? languageSelector.value : getPreferredLanguage();
+
         const payload = {
           contents: [{
             role: "user",
@@ -67,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }]
         };
 
-        const apiKey = "YOUR_API_KEY_HERE"; // Replace this with a valid API key
+        const apiKey = "YOUR_API_KEY_HERE"; // Replace with your valid API key
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(apiUrl, {
@@ -117,8 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Support Enter key to trigger translation
     inputText.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
+        e.preventDefault();
         translateButton.click();
       }
     });
