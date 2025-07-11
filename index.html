@@ -12,9 +12,9 @@
                 <div class="sidebar-top"></div>
                 
                 <div class="sidebar-buttons">
-                    <button onclick="window.location.href='contacts.html'">Contacts</button>
-                    <button onclick="window.location.href='settings.html'">Settings and Preferences</button>
-                    <button onclick="window.location.href='signin.html'">Logout</button>
+                    <button id="contacts-button" onclick="window.location.href='contacts.html'">Contacts</button>
+                    <button id="settings-button" onclick="window.location.href='settings.html'">Settings and Preferences</button>
+                    <button id="logout-button" onclick="window.location.href='signin.html'">Logout</button>
                 </div>
             </div>
         </div>
@@ -24,27 +24,15 @@
         <!-- Main Chat Area -->
         <div class="main">
 
-        <div class="topbar">
-            <div class="contact-name">Placeholder Contact</div>
-            <div class="contact-language">
+            <div class="topbar">
+                <div class="contact-name" id="contact-name">Placeholder Contact</div>
+                <div class="contact-language" id="contact-language-label">Contact Language</div>
                 <select id="targetLanguage" class="language-selector">
+                    <option value="en">English</option>
                     <option value="es">Spanish</option>
                     <option value="fr">French</option>
                     <option value="de">German</option>
-                    <option value="zh">Chinese (Simplified)</option>
-                    <option value="ja">Japanese</option>
-                    <option value="ar">Arabic</option>
-                    <option value="ru">Russian</option>
-                    <option value="pt">Portuguese</option>
-                    <option value="ko">Korean</option>
-                    <option value="it">Italian</option>
                 </select>
-            </div>
-        </div>
-
-            <div class="topbar">
-                <div class="contact-name">Placeholder Contact</div>
-                <div class="contact-language">Contact Language</div>
             </div>
 
 
@@ -57,12 +45,12 @@
             </div>
 
             <div class="input-area">
-                <input type="text" placeholder="Message..." />
-                <button>Send</button>
+                <input type="text" placeholder="Message..." id="message-input" />
+                <button id="send-button">Send</button>
             </div>
         </div>
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>

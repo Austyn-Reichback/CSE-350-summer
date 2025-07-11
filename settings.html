@@ -8,26 +8,28 @@
 <body>
   <div class="settings-container">
     <div class="settings-topbar">
-      <div class="contact-name">Settings</div>
-      <button onclick="window.location.href='index.html'">← Back to Chat</button>
+      <div class="contact-name" id="settings-title">Settings</div>
+      <button onclick="window.location.href='index.html'">← <span id="back-button-label">Back to Chat</span></button>
     </div>
 
     <div class="settings-content">
-      <h2>Preferences</h2>
+      <h2 id="preferences-heading">Preferences</h2>
 
-      <label>
+      <label id="language-label">
         Language:
-        <select>
-          <option>English</option>
-          <option>Spanish</option>
-          <option>French</option>
-          <option>German</option>
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
         </select>
       </label>
 
       <!-- Add more settings here -->
     </div>
   </div>
+  
+  <script src="script.js"></script>
 </body>
 <script>
   document.addEventListener('DOMContentLoaded', () => {

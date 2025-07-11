@@ -8,14 +8,14 @@
 <body>
   <div class="contact-container">
     <div class="contacts-topbar">
-      <div>Contacts</div>
-      <button onclick="window.location.href='index.html'">← Back to Chat</button>
+      <div id="contacts-title">Contacts</div>
+      <button id="back-to-chat-button" onclick="window.location.href='index.html'">← Back to Chat</button>
     </div>
 
     <div class="contacts-section">
       <div class="add-contact">
-        <input type="text" id="contactName" placeholder="Enter contact name..." />
-        <button onclick="addContact()">Add</button>
+        <input type="text" id="contactNameInput" placeholder="Enter contact name..." />
+        <button id="add-contact-button" onclick="addContact()">Add</button>
       </div>
 
       <div class="contact-list" id="contactList">
@@ -23,6 +23,13 @@
       </div>
     </div>
   </div>
+
+  <select id="contacts-language-select">
+    <option value="en">English</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+  </select>
 
   <script src="script.js"></script>
 </body>
