@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const inputText = document.querySelector('.input-area input');
-    const targetLanguage = document.getElementById('targetLanguage');
+    const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || 'es'; // default to Spanish
     const translateButton = document.querySelector('.input-area button');
     const translatedText = document.querySelector('.message-area');
     const loadingIndicator = document.createElement('div');
@@ -8,8 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     translateButton.addEventListener('click', async () => {
         const text = inputText.value.trim();
-        const lang = targetLanguage.value;
-
+        const lang = getPreferredLanguage();
         if (!text) {
             const errorDiv = document.createElement('div');
             errorDiv.textContent = 'Please enter text to translate.';
