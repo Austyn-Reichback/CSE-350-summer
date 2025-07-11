@@ -9,22 +9,33 @@ body {
 }
 
 .sidebar {
-  background-color: #b0b0b0;
+  background-color: #b0b0b0;       /* grey background */
   width: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 10px 0;
+  justify-content: space-between;  /* pushes top and bottom sections apart */
+  padding: 0;
   border-right: 2px solid black;
 }
 
-.sidebar button {
+.sidebar-top {
+  height: 50px;
+}
+
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.sidebar-buttons button {
   background-color: #8fcb7e;
-  margin: 5px;
-  padding: 10px;
   border: 1px solid black;
-  cursor: pointer;
+  padding: 6px;
+  font-size: 12px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .main {
