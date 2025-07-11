@@ -8,29 +8,29 @@ body {
   height: 100vh;
 }
 
-/* Sidebar container (still has grey space) */
 .sidebar {
-  background-color: #b0b0b0;
-  width: 100px;
+  width: 250px; /* widened from 100px */
   height: 100vh;
-  position: relative;  /* Needed for top spacing */
+  position: fixed; /* fix sidebar */
+  top: 0;
+  left: 0;
+  background-color: #b0b0b0;
+  z-index: 15; /* above main */
 }
 
 /* Grey top space inside sidebar */
 .sidebar-top {
-  height: 50px;
+  height: 40px;
 }
 
 /* Moved button container – position it where it used to be */
 .sidebar-buttons {
-  position: absolute;
+  width: 249px;
   left: 0;
   bottom: 20px;
-  width: 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding-left: 5px;
+  position: absolute;
+  padding-left: 10px;
+  gap: 8px;
 }
 
 /* Individual button styles */
@@ -44,20 +44,30 @@ body {
 }
 
 .main {
+  margin-left: 250px; /* shift right by sidebar width */
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #f9f3dc;
   border-left: 2px solid black;
+  padding-top: 60px; /* leave room for fixed topbar */
+  position: relative;
 }
 
 .topbar {
+  position: fixed;
+  top: 0;
+  left: 250px; /* start after sidebar */
+  right: 0;
+  height: 60px;
+  background-color: #8fcb7e;
+  padding: 10px 20px;
+  border-bottom: 2px solid black;
   display: flex;
   justify-content: space-between;
-  background-color: #8fcb7e;
-  padding: 10px;
-  border-bottom: 2px solid black;
-  position: relative;
+  align-items: center;
+  z-index: 20; /* on top */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .contact-name {
