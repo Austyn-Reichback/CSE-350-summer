@@ -1,18 +1,15 @@
-
-// List of supported languages
+// Supported languages
 const supportedLanguages = ['en', 'es', 'fr', 'de'];
 
 // Detect browser language
 function detectBrowserLanguage() {
   const lang = navigator.language || navigator.userLanguage; // e.g., 'en-US'
-  const shortLang = lang.split('-')[0]; // Just 'en', 'es', etc.
-
-  return supportedLanguages.includes(shortLang) ? shortLang : 'en'; // fallback to English
+  const shortLang = lang.split('-')[0];
+  return supportedLanguages.includes(shortLang) ? shortLang : 'en';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  
-  // Language selector setup (works across multiple pages)
+  // Language selector logic
   const languageSelector =
     document.getElementById("language-select") ||
     document.getElementById("targetLanguage") ||
@@ -20,41 +17,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("register-language-select") ||
     document.getElementById("contacts-language-select");
 
-  const detectedLang = detectBrowserLanguage();
-  const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || detectedLang || 'en';
-
-  // Translation elements setup
-  const inputText = document.querySelector('.input-area input');
-  const translateButton = document.querySelector('.input-area button');
-  const translatedText = document.querySelector('.message-area');
-  const loadingIndicator = document.createElement('div');
+  const savedLang = localStorage.getItem("preferredLanguage");
+  const detectedLang = savedLang || detectBrowserLanguage();
 
   if (languageSelector) {
     languageSelector.value = detectedLang;
-    updateLanguageUI(languageSelector.value);
+    updateLanguageUI(detectedLang);
 
     languageSelector.addEventListener("change", (e) => {
-      updateLanguageUI(e.target.value);
+      const selectedLang = e.target.value;
+      localStorage.setItem("preferredLanguage", selectedLang);
+      updateLanguageUI(selectedLang);
     });
   } else {
     updateLanguageUI(detectedLang);
   }
 
-  // Translation input logic (only runs if on a page with these elements)
+  // Chat translation logic
   const inputText = document.querySelector('.input-area input');
   const targetLanguage = document.getElementById('targetLanguage');
   const translateButton = document.querySelector('.input-area button');
   const translatedText = document.querySelector('.message-area');
   const loadingIndicator = document.createElement('div');
   loadingIndicator.classList.add('loading-indicator', 'hidden');
-  if (translatedText) {
-    translatedText.appendChild(loadingIndicator);
-  }
+  if (translatedText) translatedText.appendChild(loadingIndicator);
 
   if (inputText && targetLanguage && translateButton && translatedText) {
     translateButton.addEventListener('click', async () => {
       const text = inputText.value.trim();
-      const lang = getPreferredLanguage(); // Uses stored or default language
+      const lang = targetLanguage.value;
 
       if (!text) {
         const errorDiv = document.createElement('div');
@@ -62,8 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.className = 'error-message';
         translatedText.appendChild(errorDiv);
         return;
-     }
-
+      }
 
       translatedText.innerHTML = '';
       loadingIndicator.classList.remove('hidden');
@@ -77,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }]
         };
 
-        const apiKey = "AIzaSyCuMBNIcuXj3njv2T3wAw8bajABxcuOsCU";
+        const apiKey = "YOUR_API_KEY_HERE"; // Replace this with a valid API key
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(apiUrl, {
@@ -95,36 +85,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const result = await response.json();
 
-        if (result.candidates && result.candidates.length > 0 &&
-            result.candidates[0].content && result.candidates[0].content.parts &&
-            result.candidates[0].content.parts.length > 0) {
-          
+        if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
           let translatedTextContent = result.candidates[0].content.parts[0].text;
 
-          // Clean up the response - remove common prefixes
-          translatedTextContent = translatedTextContent.replace(/^Translation:\s*/i, '');
-          translatedTextContent = translatedTextContent.replace(/^Here's the translation:\s*/i, '');
-          translatedTextContent = translatedTextContent.replace(/^The translation is:\s*/i, '');
-          translatedTextContent = translatedTextContent.replace(/^Translated text:\s*/i, '');
-          translatedTextContent = translatedTextContent.replace(/^In \w+:\s*/i, '');
-          translatedTextContent = translatedTextContent.replace(/^["']|["']$/g, '');
-          translatedTextContent = translatedTextContent.trim();
+          translatedTextContent = translatedTextContent
+            .replace(/^Translation:\s*/i, '')
+            .replace(/^Here's the translation:\s*/i, '')
+            .replace(/^The translation is:\s*/i, '')
+            .replace(/^Translated text:\s*/i, '')
+            .replace(/^In \w+:\s*/i, '')
+            .replace(/^["']|["']$/g, '')
+            .trim();
 
           const messageDiv = document.createElement('div');
           messageDiv.textContent = translatedTextContent;
           messageDiv.className = 'translated-message';
           translatedText.appendChild(messageDiv);
         } else {
-          const errorDiv = document.createElement('div');
-          errorDiv.textContent = 'Translation failed: No valid response from API.';
-          errorDiv.className = 'error-message';
-          translatedText.appendChild(errorDiv);
+          throw new Error('No valid response from API.');
         }
 
       } catch (error) {
         console.error('Error during translation:', error);
         const errorDiv = document.createElement('div');
-        errorDiv.textContent = `Translation error: ${error.message}. Please try again.`;
+        errorDiv.textContent = `Translation error: ${error.message}`;
         errorDiv.className = 'error-message';
         translatedText.appendChild(errorDiv);
       } finally {
@@ -141,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-    // Translation dictionary
+// Language translation strings
 const translations = {
   en: {
     settingsTitle: "Settings",
@@ -166,7 +150,10 @@ const translations = {
     registerPassword: "Password",
     registerConfirmPassword: "Confirm Password",
     registerButton: "Register",
-    backToSigninButton: "Back to Sign In"
+    backToSigninButton: "Back to Sign In",
+    contactsTitle: "Contacts",
+    addContactPlaceholder: "Enter contact name...",
+    addContactButton: "Add"
   },
   es: {
     settingsTitle: "Configuración",
@@ -191,7 +178,10 @@ const translations = {
     registerPassword: "Contraseña",
     registerConfirmPassword: "Confirmar contraseña",
     registerButton: "Registrar",
-    backToSigninButton: "Volver a Iniciar sesión"
+    backToSigninButton: "Volver a Iniciar sesión",
+    contactsTitle: "Contactos",
+    addContactPlaceholder: "Ingrese el nombre del contacto...",
+    addContactButton: "Agregar"
   },
   fr: {
     settingsTitle: "Paramètres",
@@ -216,7 +206,10 @@ const translations = {
     registerPassword: "Mot de passe",
     registerConfirmPassword: "Confirmer le mot de passe",
     registerButton: "S'inscrire",
-    backToSigninButton: "Retour à la connexion"
+    backToSigninButton: "Retour à la connexion",
+    contactsTitle: "Contacts",
+    addContactPlaceholder: "Entrez le nom du contact...",
+    addContactButton: "Ajouter"
   },
   de: {
     settingsTitle: "Einstellungen",
@@ -241,50 +234,48 @@ const translations = {
     registerPassword: "Passwort",
     registerConfirmPassword: "Passwort bestätigen",
     registerButton: "Registrieren",
-    backToSigninButton: "Zurück zur Anmeldung"
+    backToSigninButton: "Zurück zur Anmeldung",
+    contactsTitle: "Kontakte",
+    addContactPlaceholder: "Kontaktnamen eingeben...",
+    addContactButton: "Hinzufügen"
   }
 };
 
-
-// Shared function
+// Apply translations to elements
 function updateLanguageUI(lang) {
   const t = translations[lang] || translations.en;
 
-    // Settings page elements
-    document.getElementById("settings-title")?.textContent = t.settingsTitle;
-    document.getElementById("back-button-label")?.textContent = t.backToChat;
-    document.getElementById("preferences-heading")?.textContent = t.preferences;
-    if (document.getElementById("language-label")) {
-        document.getElementById("language-label").childNodes[0].textContent = t.languageLabel + " ";
-    }
+  document.getElementById("settings-title")?.textContent = t.settingsTitle;
+  document.getElementById("back-button-label")?.textContent = t.backToChat;
+  document.getElementById("preferences-heading")?.textContent = t.preferences;
+  if (document.getElementById("language-label")) {
+    document.getElementById("language-label").childNodes[0].textContent = t.languageLabel + " ";
+  }
 
-    // Chat page elements
-    document.getElementById("contact-name")?.textContent = t.contactName;
-    document.getElementById("contact-label")?.textContent = t.contactName;
-    document.getElementById("contact-language-label")?.textContent = t.contactLanguage;
-    document.getElementById("contacts-button")?.textContent = t.contacts;
-    document.getElementById("settings-button")?.textContent = t.settings;
-    document.getElementById("logout-button")?.textContent = t.logout;
-    document.getElementById("send-button")?.textContent = t.send;
-        // Sign In Page
-    document.getElementById("signin-title")?.textContent = t.signinTitle;
-    document.getElementById("signin-button")?.textContent = t.signinButton;
-    document.getElementById("create-account-button")?.textContent = t.createAccount;
-    document.getElementById("username")?.setAttribute("placeholder", t.username);
-    document.getElementById("password")?.setAttribute("placeholder", t.password);
-  // Register page
-    document.getElementById("register-title")?.textContent = t.registerTitle;
-    document.getElementById("register-username")?.setAttribute("placeholder", t.registerUsername);
-    document.getElementById("register-email")?.setAttribute("placeholder", t.registerEmail);
-    document.getElementById("register-password")?.setAttribute("placeholder", t.registerPassword);
-    document.getElementById("register-confirm-password")?.setAttribute("placeholder", t.registerConfirmPassword);
-    document.getElementById("register-button")?.textContent = t.registerButton;
-    document.getElementById("back-to-signin-button")?.textContent = t.backToSigninButton;
-    // Contacts page
-    document.getElementById("contacts-title")?.textContent = t.contactsTitle;
-    document.getElementById("back-to-chat-button")?.textContent = `← ${t.backToChat}`;
-    document.getElementById("contactNameInput")?.setAttribute("placeholder", t.addContactPlaceholder);
-    document.getElementById("add-contact-button")?.textContent = t.addContactButton;
+  document.getElementById("contact-name")?.textContent = t.contactName;
+  document.getElementById("contact-label")?.textContent = t.contactName;
+  document.getElementById("contact-language-label")?.textContent = t.contactLanguage;
+  document.getElementById("contacts-button")?.textContent = t.contacts;
+  document.getElementById("settings-button")?.textContent = t.settings;
+  document.getElementById("logout-button")?.textContent = t.logout;
+  document.getElementById("send-button")?.textContent = t.send;
+  document.getElementById("signin-title")?.textContent = t.signinTitle;
+  document.getElementById("signin-button")?.textContent = t.signinButton;
+  document.getElementById("create-account-button")?.textContent = t.createAccount;
+  document.getElementById("username")?.setAttribute("placeholder", t.username);
+  document.getElementById("password")?.setAttribute("placeholder", t.password);
+  document.getElementById("register-title")?.textContent = t.registerTitle;
+  document.getElementById("register-username")?.setAttribute("placeholder", t.registerUsername);
+  document.getElementById("register-email")?.setAttribute("placeholder", t.registerEmail);
+  document.getElementById("register-password")?.setAttribute("placeholder", t.registerPassword);
+  document.getElementById("register-confirm-password")?.setAttribute("placeholder", t.registerConfirmPassword);
+  document.getElementById("register-button")?.textContent = t.registerButton;
+  document.getElementById("back-to-signin-button")?.textContent = t.backToSigninButton;
+  document.getElementById("contacts-title")?.textContent = t.contactsTitle;
+  document.getElementById("back-to-chat-button")?.textContent = `← ${t.backToChat}`;
+  document.getElementById("contactNameInput")?.setAttribute("placeholder", t.addContactPlaceholder);
+  document.getElementById("add-contact-button")?.textContent = t.addContactButton;
+
   const input = document.getElementById("message-input");
   if (input) input.placeholder = t.messagePlaceholder;
 }
