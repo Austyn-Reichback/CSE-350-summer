@@ -31,4 +31,18 @@
   
   <script src="script.js"></script>
 </body>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const languageSelect = document.querySelector('.settings-content select');
+      // Load saved preference
+      const savedLang = localStorage.getItem('preferredLanguage');
+      if (savedLang) {
+          languageSelect.value = savedLang;
+      }
+      // Save on change
+      languageSelect.addEventListener('change', () => {
+          localStorage.setItem('preferredLanguage', languageSelect.value);
+      });
+  });
+  </script>
 </html>
