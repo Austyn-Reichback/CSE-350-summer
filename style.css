@@ -1,11 +1,102 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
-    text-align: center;
-    padding: 50px;
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  background-color: #b0b0b0;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-right: 2px solid black;
+}
+
+.sidebar button {
+  background-color: #8fcb7e;
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid black;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f3dc;
+  border-left: 2px solid black;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  background-color: #8fcb7e;
+  padding: 10px;
+  border-bottom: 2px solid black;
+  position: relative;
+}
+
+.contact-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-language {
+  font-weight: bold;
+}
+
+.profile-pic {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 2px solid black;
+  border-radius: 50%;
+  padding: 10px;
+  z-index: 1;
+}
+
+.avatar {
+  font-size: 40px;
+  text-align: center;
+}
+
+.message-area {
+  flex: 1;
+  padding: 50px 10px 10px;
+  overflow-y: auto;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  background-color: #8fcb7e;
+  border-top: 2px solid black;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 8px;
+  margin-right: 10px;
+  border: 2px solid black;
+  font-size: 16px;
+}
+
+.input-area button {
+  padding: 8px 16px;
+  border: 2px solid black;
+  background-color: #d8f4d1;
+  font-weight: bold;
+  cursor: pointer;
 }

@@ -6,11 +6,34 @@
     <link rel="stylesheet" href="style.css"> <!-- optional -->
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is a basic web page.</p>
+      <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <button>Contacts</button>
+      <button>Settings<br>and Preferences</button>
+      <button>Logout</button>
+    </div>
 
-    <button onclick="sayHello()">Click Me</button>
+    <!-- Main Chat Area -->
+    <div class="main">
+      <div class="topbar">
+        <div class="contact-name">Placeholder Contact</div>
+        <div class="contact-language">Contact Language</div>
+      </div>
 
-    <script src="script.js"></script> <!-- optional -->
+      <div class="profile-pic">
+        <div class="avatar">👤</div>
+      </div>
+
+      <div class="message-area">
+        <!-- Messages would go here -->
+      </div>
+
+      <div class="input-area">
+        <input type="text" placeholder="Message..." />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
