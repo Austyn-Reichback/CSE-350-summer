@@ -1,7 +1,6 @@
-// Supported languages
+// Supported languages and detect language (only declared once)
 const supportedLanguages = ['en', 'es', 'fr', 'de'];
 
-// Detect browser language
 function detectBrowserLanguage() {
   const lang = navigator.language || navigator.userLanguage; // e.g., 'en-US'
   const shortLang = lang.split('-')[0];
@@ -9,34 +8,20 @@ function detectBrowserLanguage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Language selector setup (works across multiple pages)
   const languageSelector =
     document.getElementById("language-select") ||
-    document.getElementById("targetLanguage") ||  // fallback, but should be a select
     document.getElementById("signin-language-select") ||
     document.getElementById("register-language-select") ||
     document.getElementById("contacts-language-select");
 
-  const supportedLanguages = ['en', 'es', 'fr', 'de'];
-
-  // Detect browser language
-  function detectBrowserLanguage() {
-    const lang = navigator.language || navigator.userLanguage;
-    const shortLang = lang.split('-')[0];
-    return supportedLanguages.includes(shortLang) ? shortLang : 'en';
-  }
-
   const detectedLang = detectBrowserLanguage();
 
-  // Get preferred language from localStorage or fallback
   const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || detectedLang || 'en';
 
-  // Initialize language selector value and UI
   if (languageSelector) {
     languageSelector.value = getPreferredLanguage();
     updateLanguageUI(languageSelector.value);
 
-    // When user changes language, update storage, UI, and current language variable
     languageSelector.addEventListener("change", (e) => {
       const selectedLang = e.target.value;
       localStorage.setItem("preferredLanguage", selectedLang);
@@ -46,101 +31,99 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLanguageUI(getPreferredLanguage());
   }
 
-  // Use the languageSelector's value as the current target language for translation
-  // This means you don't need a separate element with id 'targetLanguage' for language.
-  
+  // Elements for translation on chat page
   const inputText = document.querySelector('.input-area input');
   const translateButton = document.querySelector('.input-area button');
   const translatedText = document.querySelector('.message-area');
-  const loadingIndicator = document.createElement('div');
-  loadingIndicator.classList.add('loading-indicator', 'hidden');
-  if (translatedText) translatedText.appendChild(loadingIndicator);
 
-  if (inputText && translateButton && translatedText) {
-    translateButton.addEventListener('click', async () => {
-      const text = inputText.value.trim();
-      if (!text) {
-        const errorDiv = document.createElement('div');
-        errorDiv.textContent = 'Please enter text to translate.';
-        errorDiv.className = 'error-message';
-        translatedText.appendChild(errorDiv);
-        return;
-      }
+  if (translatedText) {
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.classList.add('loading-indicator', 'hidden');
+    translatedText.appendChild(loadingIndicator);
 
-      translatedText.innerHTML = '';
-      loadingIndicator.classList.remove('hidden');
-      translateButton.disabled = true;
-
-      try {
-        // Use the languageSelector's current value
-        const lang = languageSelector ? languageSelector.value : getPreferredLanguage();
-
-        const payload = {
-          contents: [{
-            role: "user",
-            parts: [{ text: `Translate this text to ${lang}. Return only the translation, no additional text: ${text}` }]
-          }]
-        };
-
-        const apiKey = "YOUR_API_KEY_HERE"; // Replace with your valid API key
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
+    if (inputText && translateButton) {
+      translateButton.addEventListener('click', async () => {
+        console.log("Translate button clicked");
+        const text = inputText.value.trim();
+        if (!text) {
+          const errorDiv = document.createElement('div');
+          errorDiv.textContent = 'Please enter text to translate.';
+          errorDiv.className = 'error-message';
+          translatedText.appendChild(errorDiv);
+          return;
         }
 
-        const result = await response.json();
+        translatedText.innerHTML = '';
+        loadingIndicator.classList.remove('hidden');
+        translateButton.disabled = true;
 
-        if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          let translatedTextContent = result.candidates[0].content.parts[0].text;
+        try {
+          const lang = languageSelector ? languageSelector.value : getPreferredLanguage();
+          console.log("Translating to:", lang);
 
-          translatedTextContent = translatedTextContent
-            .replace(/^Translation:\s*/i, '')
-            .replace(/^Here's the translation:\s*/i, '')
-            .replace(/^The translation is:\s*/i, '')
-            .replace(/^Translated text:\s*/i, '')
-            .replace(/^In \w+:\s*/i, '')
-            .replace(/^["']|["']$/g, '')
-            .trim();
+          const payload = {
+            contents: [{
+              role: "user",
+              parts: [{ text: `Translate this text to ${lang}. Return only the translation, no additional text: ${text}` }]
+            }]
+          };
 
-          const messageDiv = document.createElement('div');
-          messageDiv.textContent = translatedTextContent;
-          messageDiv.className = 'translated-message';
-          translatedText.appendChild(messageDiv);
-        } else {
-          throw new Error('No valid response from API.');
+          const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual API key
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
+          }
+
+          const result = await response.json();
+
+          if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            let translatedTextContent = result.candidates[0].content.parts[0].text;
+            translatedTextContent = translatedTextContent
+              .replace(/^Translation:\s*/i, '')
+              .replace(/^Here's the translation:\s*/i, '')
+              .replace(/^The translation is:\s*/i, '')
+              .replace(/^Translated text:\s*/i, '')
+              .replace(/^In \w+:\s*/i, '')
+              .replace(/^["']|["']$/g, '')
+              .trim();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = translatedTextContent;
+            messageDiv.className = 'translated-message';
+            translatedText.appendChild(messageDiv);
+          } else {
+            throw new Error('No valid response from API.');
+          }
+        } catch (error) {
+          console.error('Error during translation:', error);
+          const errorDiv = document.createElement('div');
+          errorDiv.textContent = `Translation error: ${error.message}`;
+          errorDiv.className = 'error-message';
+          translatedText.appendChild(errorDiv);
+        } finally {
+          loadingIndicator.classList.add('hidden');
+          translateButton.disabled = false;
         }
+      });
 
-      } catch (error) {
-        console.error('Error during translation:', error);
-        const errorDiv = document.createElement('div');
-        errorDiv.textContent = `Translation error: ${error.message}`;
-        errorDiv.className = 'error-message';
-        translatedText.appendChild(errorDiv);
-      } finally {
-        loadingIndicator.classList.add('hidden');
-        translateButton.disabled = false;
-      }
-    });
-
-    // Support Enter key to trigger translation
-    inputText.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        translateButton.click();
-      }
-    });
+      inputText.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          translateButton.click();
+        }
+      });
+    }
   }
 });
+
 
 // Language translation strings
 const translations = {
