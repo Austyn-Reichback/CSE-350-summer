@@ -11,102 +11,136 @@ function detectBrowserLanguage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const inputText = document.querySelector('.input-area input');
-    const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || 'es'; // default to Spanish
-    const translateButton = document.querySelector('.input-area button');
-    const translatedText = document.querySelector('.message-area');
-    const loadingIndicator = document.createElement('div');
-    
+  
+  // Language selector setup (works across multiple pages)
+  const languageSelector =
+    document.getElementById("language-select") ||
+    document.getElementById("targetLanguage") ||
+    document.getElementById("signin-language-select") ||
+    document.getElementById("register-language-select") ||
+    document.getElementById("contacts-language-select");
 
+  const detectedLang = detectBrowserLanguage();
+  const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || detectedLang || 'en';
+
+  // Translation elements setup
+  const inputText = document.querySelector('.input-area input');
+  const translateButton = document.querySelector('.input-area button');
+  const translatedText = document.querySelector('.message-area');
+  const loadingIndicator = document.createElement('div');
+
+  if (languageSelector) {
+    languageSelector.value = detectedLang;
+    updateLanguageUI(languageSelector.value);
+
+    languageSelector.addEventListener("change", (e) => {
+      updateLanguageUI(e.target.value);
+    });
+  } else {
+    updateLanguageUI(detectedLang);
+  }
+
+  // Translation input logic (only runs if on a page with these elements)
+  const inputText = document.querySelector('.input-area input');
+  const targetLanguage = document.getElementById('targetLanguage');
+  const translateButton = document.querySelector('.input-area button');
+  const translatedText = document.querySelector('.message-area');
+  const loadingIndicator = document.createElement('div');
+  loadingIndicator.classList.add('loading-indicator', 'hidden');
+  if (translatedText) {
+    translatedText.appendChild(loadingIndicator);
+  }
+
+  if (inputText && targetLanguage && translateButton && translatedText) {
     translateButton.addEventListener('click', async () => {
-        const text = inputText.value.trim();
-        const lang = getPreferredLanguage();
-        if (!text) {
-            const errorDiv = document.createElement('div');
-            errorDiv.textContent = 'Please enter text to translate.';
-            errorDiv.className = 'error-message';
-            translatedText.appendChild(errorDiv);
-            return;
+      const text = inputText.value.trim();
+      const lang = getPreferredLanguage(); // Uses stored or default language
+
+      if (!text) {
+        const errorDiv = document.createElement('div');
+        errorDiv.textContent = 'Please enter text to translate.';
+        errorDiv.className = 'error-message';
+        translatedText.appendChild(errorDiv);
+        return;
+     }
+
+
+      translatedText.innerHTML = '';
+      loadingIndicator.classList.remove('hidden');
+      translateButton.disabled = true;
+
+      try {
+        const payload = {
+          contents: [{
+            role: "user",
+            parts: [{ text: `Translate this text to ${lang}. Return only the translation, no additional text: ${text}` }]
+          }]
+        };
+
+        const apiKey = "AIzaSyCuMBNIcuXj3njv2T3wAw8bajABxcuOsCU";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
         }
 
-        // Clear previous messages
-        translatedText.innerHTML = '';
-        loadingIndicator.classList.remove('hidden');
-        translateButton.disabled = true;
+        const result = await response.json();
 
-        try {
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: `Translate this text to ${lang}. Return only the translation, no additional text: ${text}` }]
-                }]
-            };
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+          
+          let translatedTextContent = result.candidates[0].content.parts[0].text;
 
-            const apiKey = "AIzaSyCuMBNIcuXj3njv2T3wAw8bajABxcuOsCU"; 
+          // Clean up the response - remove common prefixes
+          translatedTextContent = translatedTextContent.replace(/^Translation:\s*/i, '');
+          translatedTextContent = translatedTextContent.replace(/^Here's the translation:\s*/i, '');
+          translatedTextContent = translatedTextContent.replace(/^The translation is:\s*/i, '');
+          translatedTextContent = translatedTextContent.replace(/^Translated text:\s*/i, '');
+          translatedTextContent = translatedTextContent.replace(/^In \w+:\s*/i, '');
+          translatedTextContent = translatedTextContent.replace(/^["']|["']$/g, '');
+          translatedTextContent = translatedTextContent.trim();
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
-            }
-
-            const result = await response.json();
-            console.log('API Response:', result); // Debug log
-
-            if (result.candidates && result.candidates.length > 0 &&
-                result.candidates[0].content && result.candidates[0].content.parts &&
-                result.candidates[0].content.parts.length > 0) {
-                
-                let translatedTextContent = result.candidates[0].content.parts[0].text;
-                
-                // Clean up the response - remove common prefixes
-                translatedTextContent = translatedTextContent.replace(/^Translation:\s*/i, '');
-                translatedTextContent = translatedTextContent.replace(/^Here's the translation:\s*/i, '');
-                translatedTextContent = translatedTextContent.replace(/^The translation is:\s*/i, '');
-                translatedTextContent = translatedTextContent.replace(/^Translated text:\s*/i, '');
-                translatedTextContent = translatedTextContent.replace(/^In \w+:\s*/i, '');
-                translatedTextContent = translatedTextContent.replace(/^["']|["']$/g, '');
-                translatedTextContent = translatedTextContent.trim();
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.textContent = translatedTextContent;
-                messageDiv.className = 'translated-message';
-                translatedText.appendChild(messageDiv);
-            } else {
-                const errorDiv = document.createElement('div');
-                errorDiv.textContent = 'Translation failed: No valid response from API.';
-                errorDiv.className = 'error-message';
-                translatedText.appendChild(errorDiv);
-            }
-
-        } catch (error) {
-            console.error('Error during translation:', error);
-            const errorDiv = document.createElement('div');
-            errorDiv.textContent = `Translation error: ${error.message}. Please try again.`;
-            errorDiv.className = 'error-message';
-            translatedText.appendChild(errorDiv);
-        } finally {
-            loadingIndicator.classList.add('hidden');
-            translateButton.disabled = false;
+          const messageDiv = document.createElement('div');
+          messageDiv.textContent = translatedTextContent;
+          messageDiv.className = 'translated-message';
+          translatedText.appendChild(messageDiv);
+        } else {
+          const errorDiv = document.createElement('div');
+          errorDiv.textContent = 'Translation failed: No valid response from API.';
+          errorDiv.className = 'error-message';
+          translatedText.appendChild(errorDiv);
         }
+
+      } catch (error) {
+        console.error('Error during translation:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.textContent = `Translation error: ${error.message}. Please try again.`;
+        errorDiv.className = 'error-message';
+        translatedText.appendChild(errorDiv);
+      } finally {
+        loadingIndicator.classList.add('hidden');
+        translateButton.disabled = false;
+      }
     });
 
-    // Allow sending with Enter key
     inputText.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            translateButton.click();
-        }
+      if (e.key === 'Enter') {
+        translateButton.click();
+      }
     });
+  }
 });
+
     // Translation dictionary
 const translations = {
   en: {
@@ -254,29 +288,3 @@ function updateLanguageUI(lang) {
   const input = document.getElementById("message-input");
   if (input) input.placeholder = t.messagePlaceholder;
 }
-
-// Auto-apply on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const languageSelector = 
-    document.getElementById("language-select") ||
-    document.getElementById("targetLanguage") ||
-    document.getElementById("signin-language-select")||
-    document.getElementById("register-language-select") ||
-    document.getElementById("contacts-language-select");
-
-  const detectedLang = detectBrowserLanguage();
-
-  if (languageSelector) {
-    // Set dropdown to detected language if available
-    languageSelector.value = detectedLang;
-    updateLanguageUI(languageSelector.value);
-
-    languageSelector.addEventListener("change", (e) => {
-      updateLanguageUI(e.target.value);
-    });
-  } else {
-    // Fallback: apply detected language directly if no dropdown is present
-    updateLanguageUI(detectedLang);
-  }
-});
-
