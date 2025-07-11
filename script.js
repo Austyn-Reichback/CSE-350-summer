@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const translateButton = document.querySelector('.input-area button');
     const translatedText = document.querySelector('.message-area');
     const loadingIndicator = document.createElement('div');
-    loadingIndicator.className = 'loading hidden';
-    loadingIndicator.textContent = 'Translating...';
-    document.querySelector('.main').appendChild(loadingIndicator);
+    
 
     translateButton.addEventListener('click', async () => {
         const text = inputText.value.trim();
