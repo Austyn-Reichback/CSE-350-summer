@@ -11,6 +11,7 @@ function detectBrowserLanguage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  
   // Language selector setup (works across multiple pages)
   const languageSelector =
     document.getElementById("language-select") ||
@@ -20,6 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("contacts-language-select");
 
   const detectedLang = detectBrowserLanguage();
+  const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || detectedLang || 'en';
+
+  // Translation elements setup
+  const inputText = document.querySelector('.input-area input');
+  const translateButton = document.querySelector('.input-area button');
+  const translatedText = document.querySelector('.message-area');
+  const loadingIndicator = document.createElement('div');
 
   if (languageSelector) {
     languageSelector.value = detectedLang;
@@ -46,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (inputText && targetLanguage && translateButton && translatedText) {
     translateButton.addEventListener('click', async () => {
       const text = inputText.value.trim();
-      const lang = targetLanguage.value;
+      const lang = getPreferredLanguage(); // Uses stored or default language
 
       if (!text) {
         const errorDiv = document.createElement('div');
@@ -54,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.className = 'error-message';
         translatedText.appendChild(errorDiv);
         return;
-      }
+     }
+
 
       translatedText.innerHTML = '';
       loadingIndicator.classList.remove('hidden');
