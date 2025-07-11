@@ -1,3 +1,4 @@
+/*main */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -131,6 +132,7 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
+/* Contacts page */
 body {
   font-family: sans-serif;
   margin: 0;
@@ -186,6 +188,7 @@ button {
   margin-bottom: 5px;
   border-bottom: 1px solid #ddd;
 }
+/* Sign-in page */
 .signin-container {
   width: 300px;
   margin: 100px auto;
@@ -214,3 +217,35 @@ button {
   color: red;
   font-size: 14px;
 }
+
+/* Settings page */
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.settings-topbar {
+  height: 60px;
+  background-color: #eee;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.settings-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #fafafa;
+}
+
