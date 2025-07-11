@@ -25,28 +25,27 @@ body {
 
 /* Moved button container – position it where it used to be */
 .sidebar-buttons {
-  width: 100%;;
+  width: 100%;      /* full sidebar width */
   left: 0;
   bottom: 20px;
   position: absolute;
-  padding-left: 0;
+  padding: 0 10px;
   gap: 8px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box; /* prevents overflow */
 }
 
-/* Individual button styles */
 .sidebar-buttons button {
+  width: 100%;
+  height: 40px;      /* fixed consistent height */
   background-color: #8fcb7e;
   border: 1px solid black;
-  padding: 6px;
-  width: 100%;
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
-  width: 100%;
-  height: 40px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* prevent overflow from padding/border */
 }
 
 .main {
@@ -63,8 +62,7 @@ body {
 .topbar {
   position: fixed;
   top: 0;
-  left: 0px;
-  width: 100%;
+  left: 0px; 
   right: 0;
   height: 60px;
   background-color: #8fcb7e;
@@ -90,18 +88,18 @@ body {
 
 .profile-pic {
   position: absolute;
-  top: 30px;
+  top: 60px; /* height of .topbar */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%); /* center horizontally, pull up halfway */
   background-color: #fff;
   border: 2px solid black;
   border-radius: 50%;
   padding: 10px;
-  z-index: 1;
+  z-index: 25; /* above .topbar but below modal layers */
 }
 
 .avatar {
-  font-size: 40px;
+  font-size: 50px;
   text-align: center;
 }
 
