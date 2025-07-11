@@ -25,12 +25,14 @@ body {
 
 /* Moved button container – position it where it used to be */
 .sidebar-buttons {
-  width: 249px;
+  width: 100%;;
   left: 0;
   bottom: 20px;
   position: absolute;
-  padding-left: 10px;
+  padding-left: 0;
   gap: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Individual button styles */
@@ -38,9 +40,13 @@ body {
   background-color: #8fcb7e;
   border: 1px solid black;
   padding: 6px;
+  width: 100%;
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .main {
@@ -57,7 +63,8 @@ body {
 .topbar {
   position: fixed;
   top: 0;
-  left: 250px; /* start after sidebar */
+  left: 0px;
+  width: 100%;
   right: 0;
   height: 60px;
   background-color: #8fcb7e;
