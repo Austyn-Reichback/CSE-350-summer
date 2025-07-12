@@ -3,7 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sign In - CSE 350</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .signin-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #signin-title {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    #create-account-button {
+      background: transparent;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    #create-account-button:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    select {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 2px solid #ddd;
+      background: white;
+    }
+
+    #signin-message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
 </head>
 <body>
   <div class="signin-container">
@@ -13,19 +113,155 @@
     <input type="password" id="password" placeholder="Password" />
 
     <button id="signin-button" onclick="signIn()">Sign In</button>
-    <button id="create-account-button" onclick="window.location.href='register.html'">Create New Account</button>
+    <button id="create-account-button" onclick="goToRegister()">Create New Account</button>
 
     <p id="signin-message"></p>
   </div>
 
   <!-- Language selection dropdown -->
-  <select id="signin-language-select">
+  <select id="signin-language-select" onchange="changeLanguage()">
     <option value="en">English</option>
     <option value="es">Spanish</option>
     <option value="fr">French</option>
     <option value="de">German</option>
   </select>
 
-  <script src="script.js"></script>
+  <script>
+    // Translation object
+    const translations = {
+      en: {
+        title: "Welcome to CSE 350 Translator",
+        username: "Username",
+        password: "Password",
+        signin: "Sign In",
+        create: "Create New Account",
+        success: "Login successful! Welcome back.",
+        invalidCredentials: "Invalid username or password.",
+        emptyFields: "Please fill in all fields."
+      },
+      es: {
+        title: "Bienvenido al Traductor CSE 350",
+        username: "Nombre de usuario",
+        password: "Contraseña",
+        signin: "Iniciar Sesión",
+        create: "Crear Nueva Cuenta",
+        success: "¡Inicio de sesión exitoso! Bienvenido de nuevo.",
+        invalidCredentials: "Nombre de usuario o contraseña inválidos.",
+        emptyFields: "Por favor complete todos los campos."
+      },
+      fr: {
+        title: "Bienvenue au Traducteur CSE 350",
+        username: "Nom d'utilisateur",
+        password: "Mot de passe",
+        signin: "Se Connecter",
+        create: "Créer un Nouveau Compte",
+        success: "Connexion réussie! Bon retour.",
+        invalidCredentials: "Nom d'utilisateur ou mot de passe invalide.",
+        emptyFields: "Veuillez remplir tous les champs."
+      },
+      de: {
+        title: "Willkommen zum CSE 350 Übersetzer",
+        username: "Benutzername",
+        password: "Passwort",
+        signin: "Anmelden",
+        create: "Neues Konto Erstellen",
+        success: "Anmeldung erfolgreich! Willkommen zurück.",
+        invalidCredentials: "Ungültiger Benutzername oder Passwort.",
+        emptyFields: "Bitte füllen Sie alle Felder aus."
+      }
+    };
+
+    // Default users for demo
+    const users = [
+      { username: "admin", password: "password123" },
+      { username: "student", password: "cse350" },
+      { username: "demo", password: "demo123" }
+    ];
+
+    // Current language
+    let currentLanguage = 'en';
+
+    // Sign in function
+    function signIn() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const messageElement = document.getElementById('signin-message');
+
+      // Clear previous messages
+      messageElement.style.display = 'none';
+      messageElement.className = '';
+
+      // Validate input
+      if (!username || !password) {
+        showMessage(translations[currentLanguage].emptyFields, 'error');
+        return;
+      }
+
+      // Check credentials
+      const user = users.find(u => u.username === username && u.password === password);
+      
+      if (user) {
+        showMessage(translations[currentLanguage].success, 'success');
+        
+        // Store user session
+        localStorage.setItem('currentUser', username);
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Redirect after 2 seconds (you can change this to your main page)
+        setTimeout(() => {
+          alert('Redirecting to main translator page...');
+          // window.location.href = 'translator.html'; // Uncomment when you have a main page
+        }, 2000);
+      } else {
+        showMessage(translations[currentLanguage].invalidCredentials, 'error');
+      }
+    }
+
+    // Show message function
+    function showMessage(message, type) {
+      const messageElement = document.getElementById('signin-message');
+      messageElement.textContent = message;
+      messageElement.className = type;
+      messageElement.style.display = 'block';
+    }
+
+    // Go to register page
+    function goToRegister() {
+      alert('Registration page would open here. Create register.html for full functionality.');
+      // window.location.href = 'register.html'; // Uncomment when you create register page
+    }
+
+    // Change language function
+    function changeLanguage() {
+      const select = document.getElementById('signin-language-select');
+      currentLanguage = select.value;
+      
+      // Update text content
+      document.getElementById('signin-title').textContent = translations[currentLanguage].title;
+      document.getElementById('username').placeholder = translations[currentLanguage].username;
+      document.getElementById('password').placeholder = translations[currentLanguage].password;
+      document.getElementById('signin-button').textContent = translations[currentLanguage].signin;
+      document.getElementById('create-account-button').textContent = translations[currentLanguage].create;
+      
+      // Clear any existing messages
+      document.getElementById('signin-message').style.display = 'none';
+    }
+
+    // Handle Enter key press
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        signIn();
+      }
+    });
+
+    // Initialize on page load
+    window.onload = function() {
+      // Check if user is already logged in
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        const username = localStorage.getItem('currentUser');
+        showMessage(`Welcome back, ${username}!`, 'success');
+      }
+    };
+  </script>
 </body>
 </html>
