@@ -3,48 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>CSE 350 Translation Webpage</title>
-    <link rel="stylesheet" href="style.css"> <!-- optional -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Add Firebase SDKs before your script.js -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="container">
        <div class="sidebar-wrapper">
             <div class="sidebar">
                 <div class="sidebar-top"></div>
-                
                 <div class="sidebar-buttons">
                     <button id="contacts-button" onclick="window.location.href='contacts.html'">Contacts</button>
                     <button id="settings-button" onclick="window.location.href='settings.html'">Settings and Preferences</button>
-                    <button id="logout-button" onclick="window.location.href='signin.html'">Logout</button>
+                    <button id="logout-button" onclick=logout()>Logout</button>
                 </div>
             </div>
         </div>
-
-
-
         <!-- Main Chat Area -->
         <div class="main">
-
             <div class="topbar">
                 <div class="contact-name" id="contact-name">Placeholder Contact</div>
                 <div class="contact-language" id="contact-language-label">Contact Language</div>
             </div>
-
-
             <div class="profile-pic">
                 <div class="avatar">👤</div>
             </div>
-
             <div class="message-area">
                 <!-- Messages would go here -->
             </div>
-
             <div class="input-area">
                 <input type="text" placeholder="Message..." id="message-input" />
                 <button id="send-button">Send</button>
             </div>
         </div>
     </div>
-    
     <script src="script.js"></script>
 </body>
 </html>

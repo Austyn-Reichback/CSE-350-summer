@@ -64,6 +64,12 @@
       transform: translateY(-2px);
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     #create-account-button {
       background: transparent;
       color: #667eea;
@@ -103,17 +109,32 @@
       color: #721c24;
       border: 1px solid #f5c6cb;
     }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
   <div class="signin-container">
     <h2 id="signin-title">Welcome to CSE 350 Translator</h2>
 
-    <input type="text" id="username" placeholder="Username" />
+    <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
 
     <button id="signin-button" onclick="signIn()">Sign In</button>
-    <button id="create-account-button" onclick="goToRegister()">Create New Account</button>
+    <button id="create-account-button" onclick="createAccount()">Create New Account</button>
 
     <p id="signin-message"></p>
   </div>
@@ -126,96 +147,216 @@
     <option value="de">German</option>
   </select>
 
-  <script>
+  <!-- Firebase SDKs -->
+  <script type="module" >
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfeovprG-VnbApfAuMGq11H5rdyU-LJuQ",
+      authDomain: "translator-app-d31d1.firebaseapp.com",
+      projectId: "translator-app-d31d1",
+      storageBucket: "translator-app-d31d1.firebasestorage.app",
+      messagingSenderId: "969041217859",
+      appId: "1:969041217859:web:0df2b9d0850c4097e987f6",
+      measurementId: "G-DGT3QCMV61"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     // Translation object
     const translations = {
       en: {
         title: "Welcome to CSE 350 Translator",
-        username: "Username",
+        email: "Email",
         password: "Password",
         signin: "Sign In",
         create: "Create New Account",
         success: "Login successful! Welcome back.",
-        invalidCredentials: "Invalid username or password.",
-        emptyFields: "Please fill in all fields."
+        createSuccess: "Account created successfully! Welcome!",
+        invalidCredentials: "Invalid email or password.",
+        emptyFields: "Please fill in all fields.",
+        weakPassword: "Password should be at least 6 characters.",
+        emailInUse: "Email address is already in use.",
+        invalidEmail: "Please enter a valid email address.",
+        loading: "Please wait..."
       },
       es: {
         title: "Bienvenido al Traductor CSE 350",
-        username: "Nombre de usuario",
+        email: "Correo electrónico",
         password: "Contraseña",
         signin: "Iniciar Sesión",
         create: "Crear Nueva Cuenta",
         success: "¡Inicio de sesión exitoso! Bienvenido de nuevo.",
-        invalidCredentials: "Nombre de usuario o contraseña inválidos.",
-        emptyFields: "Por favor complete todos los campos."
+        createSuccess: "¡Cuenta creada exitosamente! ¡Bienvenido!",
+        invalidCredentials: "Correo electrónico o contraseña inválidos.",
+        emptyFields: "Por favor complete todos los campos.",
+        weakPassword: "La contraseña debe tener al menos 6 caracteres.",
+        emailInUse: "La dirección de correo electrónico ya está en uso.",
+        invalidEmail: "Por favor ingrese una dirección de correo electrónico válida.",
+        loading: "Por favor espere..."
       },
       fr: {
         title: "Bienvenue au Traducteur CSE 350",
-        username: "Nom d'utilisateur",
+        email: "Adresse e-mail",
         password: "Mot de passe",
         signin: "Se Connecter",
         create: "Créer un Nouveau Compte",
         success: "Connexion réussie! Bon retour.",
-        invalidCredentials: "Nom d'utilisateur ou mot de passe invalide.",
-        emptyFields: "Veuillez remplir tous les champs."
+        createSuccess: "Compte créé avec succès! Bienvenue!",
+        invalidCredentials: "Email ou mot de passe invalide.",
+        emptyFields: "Veuillez remplir tous les champs.",
+        weakPassword: "Le mot de passe doit contenir au moins 6 caractères.",
+        emailInUse: "L'adresse e-mail est déjà utilisée.",
+        invalidEmail: "Veuillez saisir une adresse e-mail valide.",
+        loading: "Veuillez patienter..."
       },
       de: {
         title: "Willkommen zum CSE 350 Übersetzer",
-        username: "Benutzername",
+        email: "E-Mail-Adresse",
         password: "Passwort",
         signin: "Anmelden",
         create: "Neues Konto Erstellen",
         success: "Anmeldung erfolgreich! Willkommen zurück.",
-        invalidCredentials: "Ungültiger Benutzername oder Passwort.",
-        emptyFields: "Bitte füllen Sie alle Felder aus."
+        createSuccess: "Konto erfolgreich erstellt! Willkommen!",
+        invalidCredentials: "Ungültige E-Mail oder Passwort.",
+        emptyFields: "Bitte füllen Sie alle Felder aus.",
+        weakPassword: "Das Passwort sollte mindestens 6 Zeichen lang sein.",
+        emailInUse: "E-Mail-Adresse wird bereits verwendet.",
+        invalidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+        loading: "Bitte warten..."
       }
     };
-
-    // Default users for demo
-    const users = [
-      { username: "admin", password: "password123" },
-      { username: "student", password: "cse350" },
-      { username: "demo", password: "demo123" }
-    ];
 
     // Current language
     let currentLanguage = 'en';
 
     // Sign in function
-    function signIn() {
-      const username = document.getElementById('username').value.trim();
+    window.signIn = async function() {
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const messageElement = document.getElementById('signin-message');
+      const signinButton = document.getElementById('signin-button');
 
       // Clear previous messages
       messageElement.style.display = 'none';
       messageElement.className = '';
 
       // Validate input
-      if (!username || !password) {
+      if (!email || !password) {
         showMessage(translations[currentLanguage].emptyFields, 'error');
         return;
       }
 
-      // Check credentials
-      const user = users.find(u => u.username === username && u.password === password);
-      
-      if (user) {
+      // Show loading state
+      signinButton.disabled = true;
+      signinButton.innerHTML = `<span class="loading"></span> ${translations[currentLanguage].loading}`;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
         showMessage(translations[currentLanguage].success, 'success');
         
         // Store user session
-        localStorage.setItem('currentUser', username);
+        localStorage.setItem('currentUser', user.email);
         localStorage.setItem('isLoggedIn', 'true');
         
-        // Redirect after 2 seconds (you can change this to your main page)
+        // Redirect after 2 seconds
         setTimeout(() => {
-          alert('Redirecting to main translator page...');
-          // window.location.href = 'translator.html'; // Uncomment when you have a main page
+          window.location.href = 'index.html';
         }, 2000);
-      } else {
-        showMessage(translations[currentLanguage].invalidCredentials, 'error');
+        
+      } catch (error) {
+        let errorMessage = translations[currentLanguage].invalidCredentials;
+        
+        switch (error.code) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            errorMessage = translations[currentLanguage].invalidCredentials;
+            break;
+          case 'auth/invalid-email':
+            errorMessage = translations[currentLanguage].invalidEmail;
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Too many failed attempts. Please try again later.';
+            break;
+          default:
+            errorMessage = error.message;
+        }
+        
+        showMessage(errorMessage, 'error');
+      } finally {
+        // Reset button state
+        signinButton.disabled = false;
+        signinButton.textContent = translations[currentLanguage].signin;
       }
-    }
+    };
+
+    // Create account function
+    window.createAccount = async function() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const messageElement = document.getElementById('signin-message');
+      const createButton = document.getElementById('create-account-button');
+
+      // Clear previous messages
+      messageElement.style.display = 'none';
+      messageElement.className = '';
+
+      // Validate input
+      if (!email || !password) {
+        showMessage(translations[currentLanguage].emptyFields, 'error');
+        return;
+      }
+
+      // Show loading state
+      createButton.disabled = true;
+      createButton.innerHTML = `<span class="loading"></span> ${translations[currentLanguage].loading}`;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        showMessage(translations[currentLanguage].createSuccess, 'success');
+        
+        // Store user session
+        localStorage.setItem('currentUser', user.email);
+        localStorage.setItem('isLoggedIn', 'true');
+        
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        
+      } catch (error) {
+        let errorMessage = error.message;
+        
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = translations[currentLanguage].emailInUse;
+            break;
+          case 'auth/invalid-email':
+            errorMessage = translations[currentLanguage].invalidEmail;
+            break;
+          case 'auth/weak-password':
+            errorMessage = translations[currentLanguage].weakPassword;
+            break;
+          default:
+            errorMessage = error.message;
+        }
+        
+        showMessage(errorMessage, 'error');
+      } finally {
+        // Reset button state
+        createButton.disabled = false;
+        createButton.textContent = translations[currentLanguage].create;
+      }
+    };
 
     // Show message function
     function showMessage(message, type) {
@@ -225,27 +366,21 @@
       messageElement.style.display = 'block';
     }
 
-    // Go to register page
-    function goToRegister() {
-      alert('Registration page would open here. Create register.html for full functionality.');
-      // window.location.href = 'register.html'; // Uncomment when you create register page
-    }
-
     // Change language function
-    function changeLanguage() {
+    window.changeLanguage = function() {
       const select = document.getElementById('signin-language-select');
       currentLanguage = select.value;
       
       // Update text content
       document.getElementById('signin-title').textContent = translations[currentLanguage].title;
-      document.getElementById('username').placeholder = translations[currentLanguage].username;
+      document.getElementById('email').placeholder = translations[currentLanguage].email;
       document.getElementById('password').placeholder = translations[currentLanguage].password;
       document.getElementById('signin-button').textContent = translations[currentLanguage].signin;
       document.getElementById('create-account-button').textContent = translations[currentLanguage].create;
       
       // Clear any existing messages
       document.getElementById('signin-message').style.display = 'none';
-    }
+    };
 
     // Handle Enter key press
     document.addEventListener('keypress', function(e) {
@@ -254,14 +389,37 @@
       }
     });
 
+    // Monitor auth state changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        localStorage.setItem('currentUser', user.email);
+        localStorage.setItem('isLoggedIn', 'true');
+        showMessage(`Welcome back, ${user.email}!`, 'success');
+        setTimeout(() => {
+  window.location.href = 'index.html';
+}, 2000);
+      } else {
+        // User is signed out
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('isLoggedIn');
+      }
+    });
+
     // Initialize on page load
     window.onload = function() {
-      // Check if user is already logged in
-      if (localStorage.getItem('isLoggedIn') === 'true') {
-        const username = localStorage.getItem('currentUser');
-        showMessage(`Welcome back, ${username}!`, 'success');
-      }
-    };
+  // Check if user is already logged in
+  if (localStorage.getItem('isLoggedIn') === 'true') {
+    const username = localStorage.getItem('currentUser');
+    if (username) {
+      showMessage(`Welcome back, ${username}!`, 'success');
+      // Redirect to index.html after a short delay (optional)
+      setTimeout(() => {
+        window.location.href = 'index.html';
+}, 2000);
+    }
+  }
+};
   </script>
 </body>
 </html>
