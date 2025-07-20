@@ -1,4 +1,4 @@
-
+console.log("Script loaded!"); // Debug log to confirm script is loaded
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     translateButton.addEventListener('click', async () => {
+        console.log("Translate button clicked"); // Debug log
         const text = inputText.value.trim();
         const lang = getPreferredLanguage();
         if (!text) {
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(payload)
             });
+            console.log("Fetch sent, waiting for response..."); // Debug log
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             console.log('API Response:', result);
-            console.log(result);
+            console.log(result);    // Debug log
 
             if (result.candidates && result.candidates.length > 0 &&
                 result.candidates[0].content && result.candidates[0].content.parts &&
