@@ -1,16 +1,7 @@
 console.log("Script loaded!"); // Debug log to confirm script is loaded
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
-window.logout = function() {
- signOut(auth).then(function() {  // ✅ Use signOut(auth) instead of firebase.auth().signOut()
-     localStorage.removeItem('isLoggedIn');
-     localStorage.removeItem('currentUser');
-     window.location.href = 'signin.html';
- }).catch(function(error) {
-     alert('Error signing out: ' + error.message);
- });
-};
+import { getAuth, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -34,6 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const translateButton = document.getElementById('send-button');
     const translatedText = document.querySelector('.message-area');
     const loadingIndicator = document.createElement('div');
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'signin.html';
+        }
+    });
+
+    window.logout = function() {
+    signOut(auth).then(function() {  // ✅ Use signOut(auth) instead of firebase.auth().signOut()
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+    window.location.href = 'signin.html';
+    }).catch(function(error) {
+    alert('Error signing out: ' + error.message);
+    });
+    };
     
 
     translateButton.addEventListener('click', async () => {
