@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             console.log('API Response:', result);
+            console.log(result);
 
             if (result.candidates && result.candidates.length > 0 &&
                 result.candidates[0].content && result.candidates[0].content.parts &&
