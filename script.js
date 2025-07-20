@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
-    const inputText = document.querySelector('.input-area input');
+    const inputText = document.getElementById('message-input');
     const getPreferredLanguage = () => localStorage.getItem('preferredLanguage') || 'es'; // default to Spanish
-    const translateButton = document.querySelector('.input-area button');
+    const translateButton = document.getElementById('send-button');
     const translatedText = document.querySelector('.message-area');
     const loadingIndicator = document.createElement('div');
     
