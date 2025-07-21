@@ -1,6 +1,21 @@
-import { auth, db } from './firebase.js';
-import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+// Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfeovprG-VnbApfAuMGq11H5rdyU-LJuQ",
+        authDomain: "translator-app-d31d1.firebaseapp.com",
+        projectId: "translator-app-d31d1",
+        storageBucket: "translator-app-d31d1.firebasestorage.app",
+        messagingSenderId: "969041217859",
+        appId: "1:969041217859:web:0df2b9d0850c4097e987f6",
+        measurementId: "G-DGT3QCMV61"
+      };
+  
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
 let userId = null;
 
 onAuthStateChanged(auth, (user) => {
