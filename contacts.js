@@ -60,3 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", addContact);
   }
 });
+
+import { addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+async function addContact() {
+  const input = document.getElementById("contactName");
+  const name = input.value.trim();
+  if (!name || !userId) return;
+
+  const contactsRef = collection(db, "users", userId, "contacts");
+  await addDoc(contactsRef, { name });
+
+  input.value = "";
+  loadContacts(); // Refresh the list
+}
