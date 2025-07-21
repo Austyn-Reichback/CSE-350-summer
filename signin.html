@@ -368,22 +368,22 @@
 
     // Change language function
    window.changeLanguage = function() {
-    const select = document.getElementById('signin-language-select');
-    currentLanguage = select.value;
-    
-    // Update text content
-    document.getElementById('signin-title').textContent = translations[currentLanguage].title;
-    document.getElementById('email').placeholder = translations[currentLanguage].email;
-    document.getElementById('password').placeholder = translations[currentLanguage].password;
-    document.getElementById('signin-button').textContent = translations[currentLanguage].signin;
-    document.getElementById('create-account-button').textContent = translations[currentLanguage].create;
-    
-    // Clear any existing messages
-    document.getElementById('signin-message').style.display = 'none';
+  const select = document.getElementById('signin-language-select');
+  currentLanguage = select.value;
+  
+  // Update text content
+  document.getElementById('signin-title').textContent = translations[currentLanguage].title;
+  document.getElementById('email').placeholder = translations[currentLanguage].email;
+  document.getElementById('password').placeholder = translations[currentLanguage].password;
+  document.getElementById('signin-button').textContent = translations[currentLanguage].signin;
+  document.getElementById('create-account-button').textContent = translations[currentLanguage].create;
+  
+  // Clear any existing messages
+  document.getElementById('signin-message').style.display = 'none';
 
-    // **Save selected language for other pages**
-    localStorage.setItem('preferredLanguage', currentLanguage);
-  };
+  // **Save selected language for other pages**
+  localStorage.setItem('preferredLanguage', currentLanguage);
+};
 
 
     // Handle Enter key press
