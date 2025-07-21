@@ -1,19 +1,6 @@
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-// Reuse existing Firebase initialization (skip re-initializing)
-const db = getFirestore();
-const auth = getAuth();
-
+import { auth, db } from './firebase.js';
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 let userId = null;
 
 onAuthStateChanged(auth, (user) => {
@@ -42,18 +29,6 @@ async function loadContacts() {
   });
 }
 
-async function addContact() {
-  const input = document.getElementById("contactName");
-  const name = input.value.trim();
-  if (!name || !userId) return;
-
-  const contactsRef = collection(db, "users", userId, "contacts");
-  await addDoc(contactsRef, { name });
-
-  input.value = "";
-  loadContacts();
-}
-
 function selectContact(id, name) {
   const items = document.querySelectorAll(".contact-item");
   items.forEach(el => {
@@ -62,3 +37,10 @@ function selectContact(id, name) {
 
   console.log("Selected contact:", name, "(id:", id + ")");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("addContactBtn");
+  if (btn) {
+    btn.addEventListener("click", addContact);
+  }
+});
