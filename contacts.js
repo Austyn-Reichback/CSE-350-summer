@@ -1,18 +1,20 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-// Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyCfeovprG-VnbApfAuMGq11H5rdyU-LJuQ",
-        authDomain: "translator-app-d31d1.firebaseapp.com",
-        projectId: "translator-app-d31d1",
-        storageBucket: "translator-app-d31d1.firebasestorage.app",
-        messagingSenderId: "969041217859",
-        appId: "1:969041217859:web:0df2b9d0850c4097e987f6",
-        measurementId: "G-DGT3QCMV61"
-      };
-  
-// Initialize Firebase
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCfeovprG-VnbApfAuMGq11H5rdyU-LJuQ",
+  authDomain: "translator-app-d31d1.firebaseapp.com",
+  projectId: "translator-app-d31d1",
+  storageBucket: "translator-app-d31d1.firebasestorage.app",
+  messagingSenderId: "969041217859",
+  appId: "1:969041217859:web:0df2b9d0850c4097e987f6",
+  measurementId: "G-DGT3QCMV61"
+};
+
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -54,15 +56,6 @@ function selectContact(id, name) {
   console.log("Selected contact:", name, "(id:", id + ")");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("addContactBtn");
-  if (btn) {
-    btn.addEventListener("click", addContact);
-  }
-});
-
-import { addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 async function addContact() {
   const input = document.getElementById("contactName");
   const name = input.value.trim();
@@ -72,5 +65,12 @@ async function addContact() {
   await addDoc(contactsRef, { name });
 
   input.value = "";
-  loadContacts(); // Refresh the list
+  loadContacts();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("addContactBtn");
+  if (btn) {
+    btn.addEventListener("click", addContact);
+  }
+});
