@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -9,22 +8,76 @@
 <body>
   <div class="contact-container">
     <div class="contacts-topbar">
-      <div>Contacts</div>
-      <button onclick="window.location.href='index.html'">← Back to Chat</button>
+      <div id="contacts-title">Contacts</div>
+      <button id="backButton" onclick="window.location.href='index.html'">← Back to Chat</button>
+    </div>
+
+    <div style="margin: 10px 0;">
+      <label for="contacts-language-select">Language:</label>
+      <select id="contacts-language-select" onchange="changeLanguage()">
+        <option value="en" selected>English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+      </select>
     </div>
 
     <div class="contacts-section">
-      <!-- contacts.html -->
-    <div class="add-contact">
-      <input type="text" id="contactName" placeholder="Enter contact name..." />
-      <button id="addContactBtn">Add</button>  <!-- remove onclick -->
-    </div>
-
+      <div class="add-contact">
+        <input type="text" id="contactName" placeholder="Enter contact name..." />
+        <button id="addContactBtn">Add</button>
+      </div>
 
       <div class="contact-list" id="contactList">
-        <!-- contacts would go here -->
+        <!-- contacts will be loaded here -->
+      </div>
     </div>
   </div>
+
+  <!-- Put translation logic before the Firebase module -->
+  <script>
+    const contactTranslations = {
+      en: {
+        contacts: "Contacts",
+        addPlaceholder: "Enter contact name...",
+        addButton: "Add",
+        back: "← Back to Chat"
+      },
+      es: {
+        contacts: "Contactos",
+        addPlaceholder: "Ingrese el nombre del contacto...",
+        addButton: "Agregar",
+        back: "← Volver al Chat"
+      },
+      fr: {
+        contacts: "Contacts",
+        addPlaceholder: "Entrez le nom du contact...",
+        addButton: "Ajouter",
+        back: "← Retour au Chat"
+      },
+      de: {
+        contacts: "Kontakte",
+        addPlaceholder: "Kontaktname eingeben...",
+        addButton: "Hinzufügen",
+        back: "← Zurück zum Chat"
+      }
+    };
+
+    let currentLanguage = localStorage.getItem('lang') || 'en';
+    document.getElementById('contacts-language-select').value = currentLanguage;
+
+    window.changeLanguage = function () {
+      const lang = document.getElementById('contacts-language-select').value;
+      localStorage.setItem('lang', lang);
+      currentLanguage = lang;
+
+      document.getElementById('contacts-title').textContent = contactTranslations[lang].contacts;
+      document.getElementById('contactName').placeholder = contactTranslations[lang].addPlaceholder;
+      document.getElementById('addContactBtn').textContent = contactTranslations[lang].addButton;
+      document.getElementById('backButton').textContent = contactTranslations[lang].back;
+    };
+  </script>
+
   <script type="module" src="contacts.js"></script>
 </body>
 </html>

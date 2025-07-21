@@ -4,40 +4,106 @@
     <meta charset="UTF-8">
     <title>CSE 350 Translation Webpage</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Add Firebase SDKs before your script.js -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="container">
-       <div class="sidebar-wrapper">
+        <div class="sidebar-wrapper">
             <div class="sidebar">
-                <div class="sidebar-top"></div>
+                <div class="sidebar-top">
+                    <!-- Language select removed -->
+                </div>
                 <div class="sidebar-buttons">
                     <button id="contacts-button" onclick="window.location.href='contacts.html'">Contacts</button>
                     <button id="settings-button" onclick="window.location.href='settings.html'">Settings and Preferences</button>
-                    <button id="logout-button" onclick=logout()>Logout</button>
+                    <button id="logout-button" onclick="logout()">Logout</button>
                 </div>
             </div>
         </div>
+
         <!-- Main Chat Area -->
         <div class="main">
             <div class="topbar">
                 <div class="contact-name" id="contact-name">Placeholder Contact</div>
                 <div class="contact-language" id="contact-language-label">Contact Language</div>
             </div>
+
             <div class="profile-pic">
                 <div class="avatar">👤</div>
             </div>
+
             <div class="message-area">
-                <!-- Messages would go here -->
+                <!-- Messages go here -->
             </div>
+
             <div class="input-area">
-                <input type="text" placeholder="Message..." id="message-input" />
+                <input type="text" id="message-input" placeholder="Message..." />
                 <button id="send-button">Send</button>
             </div>
         </div>
     </div>
+
+    <!-- Translation Script -->
+    <script>
+        const chatTranslations = {
+            en: {
+                contacts: "Contacts",
+                settings: "Settings and Preferences",
+                logout: "Logout",
+                contactLang: "English",
+                send: "Send",
+                messagePlaceholder: "Message..."
+            },
+            es: {
+                contacts: "Contactos",
+                settings: "Configuración y Preferencias",
+                logout: "Cerrar sesión",
+                contactLang: "Español",
+                send: "Enviar",
+                messagePlaceholder: "Mensaje..."
+            },
+            fr: {
+                contacts: "Contacts",
+                settings: "Paramètres et Préférences",
+                logout: "Se Déconnecter",
+                contactLang: "Français",
+                send: "Envoyer",
+                messagePlaceholder: "Message..."
+            },
+            de: {
+                contacts: "Kontakte",
+                settings: "Einstellungen und Präferenzen",
+                logout: "Abmelden",
+                contactLang: "Deutsch",
+                send: "Senden",
+                messagePlaceholder: "Nachricht..."
+            }
+        };
+
+        // Detect preferred language or fallback to English
+        const detectLanguage = () => {
+            return localStorage.getItem("lang") || navigator.language.slice(0, 2) || "en";
+        };
+
+        const applyLanguage = (lang) => {
+            const t = chatTranslations[lang] || chatTranslations["en"];
+            document.getElementById('contacts-button').textContent = t.contacts;
+            document.getElementById('settings-button').textContent = t.settings;
+            document.getElementById('logout-button').textContent = t.logout;
+            document.getElementById('contact-language-label').textContent = t.contactLang;
+            document.getElementById('send-button').textContent = t.send;
+            document.getElementById('message-input').placeholder = t.messagePlaceholder;
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const lang = detectLanguage();
+            localStorage.setItem('lang', lang);  // Save it for consistency
+            applyLanguage(lang);
+        });
+    </script>
+
     <script type="module" src="script.js"></script>
 </body>
 </html>

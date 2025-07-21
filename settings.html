@@ -28,21 +28,59 @@
       <!-- Add more settings here -->
     </div>
   </div>
-  
+
+  <script>
+    const settingsTranslations = {
+      en: {
+        settings: "Settings",
+        back: "Back to Chat",
+        preferences: "Preferences",
+        language: "Language:"
+      },
+      es: {
+        settings: "Configuración",
+        back: "Volver al chat",
+        preferences: "Preferencias",
+        language: "Idioma:"
+      },
+      fr: {
+        settings: "Paramètres",
+        back: "Retour au chat",
+        preferences: "Préférences",
+        language: "Langue:"
+      },
+      de: {
+        settings: "Einstellungen",
+        back: "Zurück zum Chat",
+        preferences: "Präferenzen",
+        language: "Sprache:"
+      }
+    };
+
+    function applySettingsLanguage(lang) {
+      const t = settingsTranslations[lang] || settingsTranslations["en"];
+      document.getElementById("settings-title").textContent = t.settings;
+      document.getElementById("back-button-label").textContent = t.back;
+      document.getElementById("preferences-heading").textContent = t.preferences;
+      document.getElementById("language-label").childNodes[0].textContent = t.language + " ";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const languageSelect = document.getElementById("language-select");
+      const savedLang = localStorage.getItem("preferredLanguage") || localStorage.getItem("lang") || navigator.language.slice(0, 2);
+
+      languageSelect.value = savedLang;
+      applySettingsLanguage(languageSelect.value);
+
+      languageSelect.addEventListener("change", () => {
+        const newLang = languageSelect.value;
+        localStorage.setItem("preferredLanguage", newLang);
+        localStorage.setItem("lang", newLang);  // Keep consistent with other pages
+        applySettingsLanguage(newLang);
+      });
+    });
+  </script>
+
   <script type="module" src="script.js"></script>
 </body>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const languageSelect = document.querySelector('.settings-content select');
-      // Load saved preference
-      const savedLang = localStorage.getItem('preferredLanguage');
-      if (savedLang) {
-          languageSelect.value = savedLang;
-      }
-      // Save on change
-      languageSelect.addEventListener('change', () => {
-          localStorage.setItem('preferredLanguage', languageSelect.value);
-      });
-  });
-  </script>
 </html>
